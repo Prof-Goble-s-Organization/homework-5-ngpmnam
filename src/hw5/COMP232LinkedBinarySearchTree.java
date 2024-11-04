@@ -1,5 +1,7 @@
 package hw5;
 
+import java.util.NoSuchElementException;
+
 /**
  * Linked implementation of a binary search tree. The binary search tree
  * inherits the methods from the binary tree. The add and remove methods must
@@ -100,16 +102,46 @@ public class COMP232LinkedBinarySearchTree<K extends Comparable<K>, V> extends C
 	 * {@inheritDoc}
 	 */
 	public V get(K key) {
-		// Intentionally not implemented - see homework assignment.
-		throw new UnsupportedOperationException("Not yet implemented");
+		return getHelper(root, key).value;
+	}
+	
+	private BTNode<K,V> getHelper(BTNode<K,V> subTreeRoot, K key) {
+		if (subTreeRoot == null) {
+			return null; // off the tree.
+		} else if (subTreeRoot.key.equals(key)) {
+			return subTreeRoot; // found it.
+		} else if (key.compareTo(subTreeRoot.key) < 0) {
+			/*
+			 * The key we are looking for is less than the key at the
+			 * subTreeRoot so if it is in the tree it will be in the left
+			 * subtree.
+			 */
+			return getHelper(subTreeRoot.left, key);
+		} else {
+			/*
+			 * The key we are looking for is greater than or equal to the key at
+			 * the subTreeRoot so if it is in the tree it will be in the right
+			 * subtree.
+			 */
+			return getHelper(subTreeRoot.right, key);
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void set(K key, V value) {
-		// Intentionally not implemented - see homework assignment.
-		throw new UnsupportedOperationException("Not yet implemented");
+		if(size == 0) {
+			root.key = key;
+			root.value = value;
+		}
+		else {
+			BTNode<K,V> nodeToSet = getHelper(root,key);
+			if(nodeToSet == null) {
+				throw new NoSuchElementException();
+			}
+			nodeToSet.value = value;
+		}
 	}
 
 	/**
@@ -170,8 +202,64 @@ public class COMP232LinkedBinarySearchTree<K extends Comparable<K>, V> extends C
 	 * {@inheritDoc}
 	 */
 	public V remove(K key) {
-		// Intentionally not implemented - see homework assignment.
-		throw new UnsupportedOperationException("Not yet implemented");
+		BTNode<K,V> removed = getHelper(root, key);
+		
+		if(removed == null) {
+			return null;
+		}
+		
+		V val = removed.value;
+		BTNode<K,V> leftChild = removed.left;
+		BTNode<K,V> rightChild = removed.right;
+		BTNode<K,V> parent = removed.parent;
+		
+		size --;
+		
+		if(removed.isLeaf() == true) {
+			if(parent == null) {
+				root = null;
+			}
+			else {
+				if(parent.left == removed) {
+					parent.left = null;
+				}
+				else {
+					parent.right = null;
+				}
+			}
+			
+		}
+		else if(rightChild == null) {
+			set(key, leftChild.value);
+			BTNode<K,V> curr = getHelper(root, key);
+			curr.left = null;
+		}
+		else if(leftChild == null) {
+			set(key, rightChild.value);
+			BTNode<K,V> curr = getHelper(root, key);
+			curr.right = null;
+		}
+		else {
+			BTNode<K,V> smallest = smallestNode(removed);
+			set(key, smallest.value);
+			if(smallest.parent.left == smallest) {
+				smallest.parent.left = null;
+			}
+			else {
+				smallest.parent.right = null;
+			}
+		}
+		 
+		return val;
+	}
+	
+	private BTNode<K,V> smallestNode(BTNode<K,V> subTreeRoot){
+		BTNode<K,V> curr = subTreeRoot.right;
+		while(curr.left != null) {
+			curr = curr.left;
+		}
+
+		return curr;
 	}
 
 	/*

@@ -91,7 +91,28 @@ public class COMP232ArrayHeap<K extends Comparable<K>, V> implements COMP232Prio
          * node up the tree.
 	 * I recommend creating a helper function to assist with the percolation.
          */
-        throw new UnsupportedOperationException("Not yet implemented");
+    	if(tree.size() == 0) {
+    		tree.add(new HeapNode<K,V>(key, value));
+    	}
+    	else {
+    		tree.add(new HeapNode<K,V>(key, value));
+        	percolate(tree.size() - 1);
+    	}
+    	
+    	
+    }
+    
+    private void percolate(int percolateUpIndex) {
+    	if(!checkHeapProperty()) {
+    		HeapNode<K,V> currNode = tree.get(percolateUpIndex);
+        	int parentIndex = getParentIndex(percolateUpIndex);
+        	HeapNode<K,V> parentNode = tree.get(parentIndex);
+        	if (currNode.key.compareTo(parentNode.key) > 0) {
+        		swap(parentIndex, percolateUpIndex);
+        	}
+        	percolate(parentIndex);
+    	}
+    	
     }
 
     /**
@@ -184,7 +205,7 @@ public class COMP232ArrayHeap<K extends Comparable<K>, V> implements COMP232Prio
             HeapNode<K, V> leftChild = tree.get(leftChildIndex);
             HeapNode<K, V> rightchild = tree.get(rightChildIndex);
 
-            if (leftChild.key.compareTo(rightchild.key) > 1) {
+            if (leftChild.key.compareTo(rightchild.key) > -1) {
                 return leftChildIndex;      // left child has a larger key
             } else {
                 return rightChildIndex;     // right child is larger
@@ -205,9 +226,6 @@ public class COMP232ArrayHeap<K extends Comparable<K>, V> implements COMP232Prio
      *          Thrown if the heap is empty
      */
     public void adjustPriority(V value, K newKey) {
-        // Intentionally not implemented -- see homework assignment
-        throw new UnsupportedOperationException("Not yet implemented.");
-
         /*
          * Find the node with the value -- Hint: Just search through the array!
          * Replace its key and then move the node to a valid location within the
@@ -216,6 +234,26 @@ public class COMP232ArrayHeap<K extends Comparable<K>, V> implements COMP232Prio
          * out of remove, then you can use those two methods to move the node to
          * a proper location.
          */
+    	
+    	if(tree.size() == 0) {
+    		throw new IllegalStateException("Empty heap");
+    	}
+    	for (int i = 0; i < tree.size(); i++) {
+    		HeapNode<K, V> curr = tree.get(i);
+    		int parentIndex = getParentIndex(i);
+        	HeapNode<K,V> parent = tree.get(i);
+    		if(curr.value.equals(value)) {
+    			curr.key = newKey;
+    			if(curr.key.compareTo(parent.key) > 0) {
+    				percolate(i);
+    			}
+    			else {
+    				trickleDown(i);
+    			}
+    			
+    		}
+    	}
+    	
     }
 
     /**
@@ -239,7 +277,7 @@ public class COMP232ArrayHeap<K extends Comparable<K>, V> implements COMP232Prio
     /**
      * Helper method that checks that the heap property is preserved. That is 
      * that every parent's key is larger than its children's keys, as defined by 
-     * the compareTo method. This is used by the tests to check the interal 
+     * the compareTo method. This is used by the tests to check the integral 
      * structure of the heap.
      */
     boolean checkHeapProperty() {
@@ -248,7 +286,7 @@ public class COMP232ArrayHeap<K extends Comparable<K>, V> implements COMP232Prio
 
     private boolean checkHeapPropertyHelper(int nodeIndex) {
         // traverse the heap, checking the heap property at each node
-        if (nodeIndex > tree.size()) {
+        if (nodeIndex >= tree.size()) {
             return true;    // off tree
         } else {
             // Note: Works on root because (0 - 1) / 2 = 0
@@ -267,6 +305,7 @@ public class COMP232ArrayHeap<K extends Comparable<K>, V> implements COMP232Prio
             }
         }
     }
+    
 
     private static class HeapNode<K, V> {
         public K key;

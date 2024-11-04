@@ -62,7 +62,6 @@ public class No11Tests {
 				30, "D");
 
 		String val = bst.remove(30);
-
 		assertEquals("Incorrect value returned", "D", val);
 		assertEquals("Incorrect size", 0, bst.size());
 		assertNull("Tree root should be null", bst.root);
