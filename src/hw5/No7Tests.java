@@ -49,6 +49,7 @@ public class No7Tests {
 		String h = "";
 		while (heap.size() > 0) {
 			h = h + heap.remove();
+			System.out.println(h);
 		}
 		assertEquals("Heap contents not in correct order", keys, h);
 	}

@@ -33,7 +33,7 @@ public class COMP232ArrayList<E> implements COMP232List<E> {
      * {@inheritDoc}
      */
     public E get(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index >= currentSize) {
+        if (index < 0 || index > currentSize) {
             throw new IndexOutOfBoundsException("accessed " + index + " but size is " + currentSize);
         } else {
             return listElements[index];
